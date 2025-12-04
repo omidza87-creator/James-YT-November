@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Analytics Report - Last 28 Days</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px 20px;
+            line-height: 1.6;
+            color: #2d3748;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            color: white;
+            padding: 60px 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            padding: 40px;
+            background: #f8fafc;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.07);
+            border-left: 4px solid #3b82f6;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 12px rgba(0,0,0,0.1);
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 2.5em;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 5px;
+        }
+
+        .stat-change {
+            font-size: 0.9em;
+            color: #10b981;
+        }
+
+        .stat-change.negative {
+            color: #ef4444;
+        }
+
+        .section {
+            padding: 40px;
+        }
+
+        .section-title {
+            font-size: 1.8em;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #1e293b;
+            border-bottom: 3px solid #3b82f6;
+            padding-bottom: 10px;
+        }
+
+        .content-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .content-table thead {
+            background: #1e3a8a;
+            color: white;
+        }
+
+        .content-table th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        .content-table td {
+            padding: 15px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .content-table tbody tr:hover {
+            background: #f1f5f9;
+        }
+
+        .metric-positive {
+            color: #10b981;
+            font-weight: 600;
+        }
+
+        .metric-neutral {
+            color: #f59e0b;
+            font-weight: 600;
+        }
+
+        .metric-negative {
+            color: #ef4444;
+            font-weight: 600;
+        }
+
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .insight-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .insight-card h3 {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+
+        .insight-card p {
+            opacity: 0.95;
+            line-height: 1.6;
+        }
+
+        .audience-section {
+            background: #fef3c7;
+            padding: 30px;
+            border-radius: 12px;
+            margin-top: 20px;
+        }
+
+        .audience-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 15px;
+        }
+
+        .audience-stat {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .audience-stat-label {
+            font-size: 0.85em;
+            color: #78716c;
+            margin-bottom: 5px;
+        }
+
+        .audience-stat-value {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #1c1917;
+        }
+
+        .recommendations {
+            background: #dcfce7;
+            padding: 30px;
+            border-radius: 12px;
+            margin-top: 20px;
+        }
+
+        .video-ideas {
+            display: grid;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .video-idea {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #10b981;
+        }
+
+        .video-idea-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+
+        .video-idea-rationale {
+            color: #475569;
+            font-size: 0.95em;
+        }
+
+        .video-idea-tag {
+            display: inline-block;
+            background: #e0e7ff;
+            color: #3730a3;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            margin-top: 10px;
+            margin-right: 5px;
+        }
+
+        .key-findings {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-top: 20px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .key-findings ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .key-findings li {
+            padding: 12px 0;
+            border-bottom: 1px solid #f1f5f9;
+            position: relative;
+            padding-left: 25px;
+        }
+
+        .key-findings li:before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: #3b82f6;
+            font-weight: bold;
+        }
+
+        .footer {
+            background: #1e293b;
+            color: white;
+            text-align: center;
+            padding: 30px;
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stat-value {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>📊 YouTube Analytics Report</h1>
+            <p>Performance Overview | Last 28 Days</p>
+            <p style="font-size: 0.9em; opacity: 0.8; margin-top: 5px;">Veer & Sant Real Estate - James Sahota Channel</p>
+        </div>
+
+        <!-- Key Performance Indicators -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total Views</div>
+                <div class="stat-value">22,005</div>
+                <div class="stat-change">↑ 3.7K above usual</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Watch Time</div>
+                <div class="stat-value">119.4h</div>
+                <div class="stat-change">About the same as usual</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">New Subscribers</div>
+                <div class="stat-value">+17</div>
+                <div class="stat-change negative">↓ 6 below usual</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Avg CTR</div>
+                <div class="stat-value">4.93%</div>
+                <div class="stat-change">39,137 impressions</div>
+            </div>
+        </div>
+
+        <!-- Executive Summary -->
+        <div class="section">
+            <h2 class="section-title">📈 Executive Summary</h2>
+            <div class="key-findings">
+                <ul>
+                    <li><strong>Viral Short Performance:</strong> "YOUR €1M SALARY: DUBAI VS UK VS USA" dominated with 10,283 views (46.7% of total views), proving comparison content resonates strongly</li>
+                    <li><strong>Audience Concentration:</strong> 93.1% male audience, heavily concentrated in 25-44 age bracket (59.5%), with UK investors as primary demographic (17%)</li>
+                    <li><strong>Content Distribution Challenge:</strong> 86.5% of watch time comes from non-subscribers, indicating strong discovery but weak subscriber conversion</li>
+                    <li><strong>Shorts Dominance:</strong> 81.5% of Shorts views come from Shorts feed with 46% retention rate, while 54% swipe away immediately</li>
+                    <li><strong>Mobile-First Consumption:</strong> 70.5% viewing on mobile devices, requiring mobile-optimized content strategy</li>
+                    <li><strong>Long-Form Opportunity:</strong> Property Management video (2,948s) generated 23.78 hours despite only 331 views, showing high engagement potential</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Top Performing Content -->
+        <div class="section" style="background: #f8fafc;">
+            <h2 class="section-title">🏆 Top 10 Performing Videos</h2>
+            <table class="content-table">
+                <thead>
+                    <tr>
+                        <th>Video Title</th>
+                        <th style="text-align: center;">Views</th>
+                        <th style="text-align: center;">Watch Time</th>
+                        <th style="text-align: center;">CTR</th>
+                        <th style="text-align: center;">Performance</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>YOUR €1M SALARY: DUBAI VS UK VS USA</strong></td>
+                        <td style="text-align: center;">10,283</td>
+                        <td style="text-align: center;">11.2h</td>
+                        <td style="text-align: center;">2.92%</td>
+                        <td style="text-align: center;"><span class="metric-positive">★★★★★</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>THE UK PROPERTY CRISIS</strong></td>
+                        <td style="text-align: center;">2,274</td>
+                        <td style="text-align: center;">4.1h</td>
+                        <td style="text-align: center;">0%</td>
+                        <td style="text-align: center;"><span class="metric-positive">★★★★</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>WHY I CHOOSE COMMISSION</strong></td>
+                        <td style="text-align: center;">1,581</td>
+                        <td style="text-align: center;">4.4h</td>
+                        <td style="text-align: center;">7.61%</td>
+                        <td style="text-align: center;"><span class="metric-positive">★★★★</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>The Last DAMAC Launch Under 3M</strong></td>
+                        <td style="text-align: center;">859</td>
+                        <td style="text-align: center;">1.7h</td>
+                        <td style="text-align: center;">5.05%</td>
+                        <td style="text-align: center;"><span class="metric-positive">★★★</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>3 Mortgage Hacks to Buy Property in Dubai</strong></td>
+                        <td style="text-align: center;">749</td>
+                        <td style="text-align: center;">6.1h</td>
+                        <td style="text-align: center;">5.43%</td>
+                        <td style="text-align: center;"><span class="metric-positive">★★★</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>STOP RELOCATING YOUR PROBLEMS</strong></td>
+                        <td style="text-align: center;">468</td>
+                        <td style="text-align: center;">0.4h</td>
+                        <td style="text-align: center;">3.35%</td>
+                        <td style="text-align: center;"><span class="metric-neutral">★★</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>HUMAN SKILLS BEAT AI</strong></td>
+                        <td style="text-align: center;">440</td>
+                        <td style="text-align: center;">0.6h</td>
+                        <td style="text-align: center;">0%</td>
+                        <td style="text-align: center;"><span class="metric-neutral">★★</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>EMAAR GUARANTEED PROFIT</strong></td>
+                        <td style="text-align: center;">404</td>
+                        <td style="text-align: center;">0.3h</td>
+                        <td style="text-align: center;">5.71%</td>
+                        <td style="text-align: center;"><span class="metric-neutral">★★</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Property Management: Why Every Investor NEEDS This</strong></td>
+                        <td style="text-align: center;">331</td>
+                        <td style="text-align: center;">23.8h</td>
+                        <td style="text-align: center;">4.95%</td>
+                        <td style="text-align: center;"><span class="metric-positive">★★★★</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>CREEK HARBOUR DUBAI'S NEXT GROWTH STORY</strong></td>
+                        <td style="text-align: center;">314</td>
+                        <td style="text-align: center;">2.8h</td>
+                        <td style="text-align: center;">3.76%</td>
+                        <td style="text-align: center;"><span class="metric-neutral">★★</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Audience Insights -->
+        <div class="section">
+            <h2 class="section-title">👥 Audience Profile & Insights</h2>
+            <div class="audience-section">
+                <h3 style="margin-bottom: 15px; color: #78350f;">Demographics & Geography</h3>
+                <div class="audience-stats">
+                    <div class="audience-stat">
+                        <div class="audience-stat-label">Gender Split</div>
+                        <div class="audience-stat-value">93.1% Male</div>
+                    </div>
+                    <div class="audience-stat">
+                        <div class="audience-stat-label">Primary Age</div>
+                        <div class="audience-stat-value">25-44 (59.5%)</div>
+                    </div>
+                    <div class="audience-stat">
+                        <div class="audience-stat-label">Top Geography</div>
+                        <div class="audience-stat-value">UK (17%)</div>
+                    </div>
+                    <div class="audience-stat">
+                        <div class="audience-stat-label">Device Type</div>
+                        <div class="audience-stat-value">Mobile (70.5%)</div>
+                    </div>
+                    <div class="audience-stat">
+                        <div class="audience-stat-label">Subscriber Watch Time</div>
+                        <div class="audience-stat-value">13.6%</div>
+                    </div>
+                    <div class="audience-stat">
+                        <div class="audience-stat-label">Shorts Retention</div>
+                        <div class="audience-stat-value">46%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Strategic Insights -->
+        <div class="section" style="background: #f8fafc;">
+            <h2 class="section-title">💡 Strategic Insights</h2>
+            <div class="insights-grid">
+                <div class="insight-card">
+                    <h3>🎯 Comparison Content Wins</h3>
+                    <p>Dubai vs UK/USA comparison content generates 4-5x more views than standard property content. This format creates emotional triggers for relocation-minded professionals.</p>
+                </div>
+                <div class="insight-card">
+                    <h3>📱 Shorts Strategy Gap</h3>
+                    <p>With 54% swipe-away rate, the first 2-3 seconds need stronger hooks. Current 46% retention is average - aim for 55-60% through pattern interrupts.</p>
+                </div>
+                <div class="insight-card">
+                    <h3>🎬 Long-Form Potential</h3>
+                    <p>Property Management video shows viewers who commit to long-form stay engaged. Create more 30-60 minute deep-dive content for serious investors.</p>
+                </div>
+                <div class="insight-card">
+                    <h3>🌍 Geographic Opportunities</h3>
+                    <p>India (11.8%) and US (10.5%) represent untapped markets. Create targeted content addressing their specific investment concerns and visa pathways.</p>
+                </div>
+                <div class="insight-card">
+                    <h3>💼 Subscriber Conversion Issue</h3>
+                    <p>86.5% non-subscriber watch time indicates discovery is working, but viewers aren't converting. Implement stronger CTAs and value propositions.</p>
+                </div>
+                <div class="insight-card">
+                    <h3>⏰ Timing Matters</h3>
+                    <p>Peak viewing at 12:00-18:00 across all days. Schedule Shorts during these windows for maximum Shorts feed placement.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content Recommendations -->
+        <div class="section">
+            <h2 class="section-title">🚀 Recommended Video Ideas</h2>
+            <div class="recommendations">
+                <h3 style="margin-bottom: 20px; color: #166534; font-size: 1.3em;">Based on Performance Data + YouTube AI Suggestions</h3>
+                
+                <div class="video-ideas">
+                    <div class="video-idea">
+                        <div class="video-idea-title">1. "YOUR £500K PENSION: UK vs DUBAI TAX COMPARISON (2025 Reality Check)"</div>
+                        <div class="video-idea-rationale">
+                            <strong>Why:</strong> Builds on top-performing salary comparison format. Targets 35-54 age demographic considering retirement relocation. UK pension rules are complex and emotionally charged.
+                        </div>
+                        <span class="video-idea-tag">Comparison</span>
+                        <span class="video-idea-tag">UK Audience</span>
+                        <span class="video-idea-tag">High CTR Potential</span>
+                    </div>
+
+                    <div class="video-idea">
+                        <div class="video-idea-title">2. "Mumbai Property vs Dubai: Why Indian Investors Are Switching (Data-Driven Analysis)"</div>
+                        <div class="video-idea-rationale">
+                            <strong>Why:</strong> India is 11.8% of your audience but underserved. Address concerns about NRI status, repatriation rules, and ROI comparisons. Massive growth market.
+                        </div>
+                        <span class="video-idea-tag">Geographic Expansion</span>
+                        <span class="video-idea-tag">India Market</span>
+                        <span class="video-idea-tag">Data-Driven</span>
+                    </div>
+
+                    <div class="video-idea">
+                        <div class="video-idea-title">3. "UK Property Market CRASH vs Dubai BOOM: Side-by-Side Analysis with Real Numbers"</div>
+                        <div class="video-idea-rationale">
+                            <strong>Why:</strong> "UK Property Crisis" got 2.3K views. Double down on UK pain points. Use actual price data, rental yields, and appreciation rates. Creates urgency.
+                        </div>
+                        <span class="video-idea-tag">Trending Topic</span>
+                        <span class="video-idea-tag">UK Focus</span>
+                        <span class="video-idea-tag">Urgency-Based</span>
+                    </div>
+
+                    <div class="video-idea">
+                        <div class="video-idea-title">4. "I Bought Dubai Property with a UK Mortgage: Here's What Nobody Tells You"</div>
+                        <div class="video-idea-rationale">
+                            <strong>Why:</strong> "3 Mortgage Hacks" performed well (749 views). Create storytelling format showing actual buyer journey with numbers, pitfalls, and wins.
+                        </div>
+                        <span class="video-idea-tag">Case Study</span>
+                        <span class="video-idea-tag">Practical</span>
+                        <span class="video-idea-tag">Storytelling</span>
+                    </div>
+
+                    <div class="video-idea">
+                        <div class="video-idea-title">5. SHORT: "£1M in Dubai Property vs UK: Which Gives You Better Life?" (60 sec)</div>
+                        <div class="video-idea-rationale">
+                            <strong>Why:</strong> Your viral Short formula works. Create rapid-fire lifestyle comparison: villa vs flat, weather, schools, taxes. Hook in 2 seconds with visual contrast.
+                        </div>
+                        <span class="video-idea-tag">Shorts</span>
+                        <span class="video-idea-tag">Viral Potential</span>
+                        <span class="video-idea-tag">Lifestyle</span>
+                    </div>
+
+                    <div class="video-idea">
+                        <div class="video-idea-title">6. "Property Management Deep Dive: Complete 60-Min Guide for Dubai Investors"</div>
+                        <div class="video-idea-rationale">
+                            <strong>Why:</strong> Your property management video got 23.8 hours from just 331 views (insane watch time). Create comprehensive series covering tenant law, maintenance, ROI optimization.
+                        </div>
+                        <span class="video-idea-tag">Long-Form</span>
+                        <span class="video-idea-tag">Educational</span>
+                        <span class="video-idea-tag">High Engagement</span>
+                    </div>
+
+                    <div class="video-idea">
+                        <div class="video-idea-title">7. "Why Silicon Valley Investors Choose Dubai Over San Francisco (Tech Tax Exodus)"</div>
+                        <div class="video-idea-rationale">
+                            <strong>Why:</strong> US is 10.5% of audience. Tech workers are high-value viewers. Connect to California exodus trend, remote work policies, and Dubai's tech hub growth.
+                        </div>
+                        <span class="video-idea-tag">US Market</span>
+                        <span class="video-idea-tag">Tech Angle</span>
+                        <span class="video-idea-tag">Premium Audience</span>
+                    </div>
+
+                    <div class="video-idea">
+                        <div class="video-idea-title">8. "DAMAC vs EMAAR vs SOBHA: Developer Comparison Nobody Will Tell You"</div>
+                        <div class="video-idea-rationale">
+                            <strong>Why:</strong> DAMAC and EMAAR mentions performed well. Create authoritative comparison on quality, handover timelines, ROI, and hidden issues. Positions you as unbiased expert.
+                        </div>
+                        <span class="video-idea-tag">Developer Focus</span>
+                        <span class="video-idea-tag">Authority Building</span>
+                        <span class="video-idea-tag">Controversial</span>
+                    </div>
+
+                    <div class="video-idea">
+                        <div class="video-idea-title">9. "From Research to Purchase: My 90-Day Dubai Property Journey (Full Process Documented)"</div>
+                        <div class="video-idea-rationale">
+                            <strong>Why:</strong> Create documentary-style vlog following real buyer. Shows research, viewings, negotiations, contracts, and handover. Builds massive trust and watch time.
+                        </div>
+                        <span class="video-idea-tag">Documentary</span>
+                        <span class="video-idea-tag">Case Study</span>
+                        <span class="video-idea-tag">Series Potential</span>
+                    </div>
+
+                    <div class="video-idea">
+                        <div class="video-idea-title">10. SHORT Series: "Dubai Property Myths vs Reality" (15 episodes x 45 sec)</div>
+                        <div class="video-idea-rationale">
+                            <strong>Why:</strong> Address common objections in punchy format: "Dubai is a bubble," "Freehold means nothing," "You can't get residency." Each Short debunks one myth with data.
+                        </div>
+                        <span class="video-idea-tag">Shorts Series</span>
+                        <span class="video-idea-tag">Educational</span>
+                        <span class="video-idea-tag">Objection Handling</span>
+                    </div>
+
+                    <div class="video-idea">
+                        <div class="video-idea-title">11. "Inside Hudayriyat Island Abu Dhabi: Is This Better Than Dubai?" (Extended Cut)</div>
+                        <div class="video-idea-rationale">
+                            <strong>Why:</strong> Your Hudayriyat video got 7.2 hours watch time. Create 40-min extended version with resident interviews, price analysis, and accessibility breakdown.
+                        </div>
+                        <span class="video-idea-tag">Location Deep Dive</span>
+                        <span class="video-idea-tag">Abu Dhabi</span>
+                        <span class="video-idea-tag">Extended Content</span>
+                    </div>
+
+                    <div class="video-idea">
+                        <div class="video-idea-title">12. "Golden Visa Breakdown: Complete 2025 Guide for UK & Indian Investors"</div>
+                        <div class="video-idea-rationale">
+                            <strong>Why:</strong> Residency concerns are top barriers. Create comprehensive guide on property value requirements, family coverage, and renewal process. Target both UK and India.
+                        </div>
+                        <span class="video-idea-tag">Visa Guide</span>
+                        <span class="video-idea-tag">Multi-Market</span>
+                        <span class="video-idea-tag">Evergreen</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p style="font-size: 0.85em; opacity: 0.7;">Data Period: Last 28 Days | Channel: James Sahota</p>
+        </div>
+    </div>
+</body>
+</html>
